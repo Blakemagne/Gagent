@@ -36,34 +36,64 @@ def main():
 
 
 def generate_content(client, messages, verbose):
-    response = client.models.generate_content(
-        model="gemini-2.0-flash-001",
-        contents=messages,
-        config=types.GenerateContentConfig(
-            tools=[available_functions], system_instruction=system_prompt
-        ),
-    )
-    if verbose:
-        print("Prompt tokens:", response.usage_metadata.prompt_token_count)
-        print("Response tokens:", response.usage_metadata.candidates_token_count)
-
-    if not response.function_calls:
-        return response.text
-
-    function_responses = []
-    for function_call_part in response.function_calls:
-        function_call_result = call_function(function_call_part, verbose)
-        if (
-            not function_call_result.parts
-            or not function_call_result.parts[0].function_response
-        ):
-            raise Exception("empty function call result")
+    max_iterations = 20
+    
+    for iteration in range(max_iterations):
+        response = client.models.generate_content(
+            model="gemini-2.0-flash-001",
+            contents=messages,
+            config=types.GenerateContentConfig(
+                tools=[available_functions], system_instruction=system_prompt
+            ),
+        )
+        
         if verbose:
-            print(f"-> {function_call_result.parts[0].function_response.response}")
-        function_responses.append(function_call_result.parts[0])
-
-    if not function_responses:
-        raise Exception("no function responses generated, exiting.")
+            print("Prompt tokens:", response.usage_metadata.prompt_token_count)
+            print("Response tokens:", response.usage_metadata.candidates_token_count)
+        
+        # Add the response candidates to messages
+        if response.candidates:
+            for candidate in response.candidates:
+                messages.append(candidate.content)
+        
+        # Check if there are function calls to make
+        if not response.function_calls:
+            # No function calls, agent is done
+            print("Final response:")
+            print(response.text)
+            return response.text
+        
+        # Process function calls
+        function_called = False
+        for function_call_part in response.function_calls:
+            function_call_result = call_function(function_call_part, verbose)
+            
+            if (
+                not function_call_result.parts
+                or not function_call_result.parts[0].function_response
+            ):
+                raise Exception("empty function call result")
+            
+            if verbose:
+                print(f"-> {function_call_result.parts[0].function_response.response}")
+            
+            # Add the function result to messages
+            messages.append(function_call_result)
+            function_called = True
+        
+        # If we made function calls, continue the loop
+        if function_called:
+            continue
+        else:
+            # No function calls were made, break out
+            print("Final response:")
+            print(response.text)
+            return response.text
+    
+    # If we've reached max iterations
+    print("Max iterations reached. Final response:")
+    print(response.text)
+    return response.text
 
 
 if __name__ == "__main__":
