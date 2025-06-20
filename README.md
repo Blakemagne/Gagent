@@ -2,6 +2,8 @@
 
 An autonomous AI agent that can analyze code, fix bugs, and implement features using Google's Gemini 2.0 Flash model.
 
+**⚠️ IMPORTANT: This agent only works within the `./calculator` directory. It cannot access or modify files outside this sandbox for security reasons.**
+
 ## Quick Start
 
 1. **Install dependencies:**
@@ -21,18 +23,20 @@ An autonomous AI agent that can analyze code, fix bugs, and implement features u
 
 ## Usage Examples
 
+**Note: All commands work only on files within the `./calculator` directory.**
+
 ### Basic Operations
 ```bash
 # List files in the calculator directory
 python main.py "what files are in the calculator?"
 
-# Read a specific file
+# Read a specific file (from calculator directory)
 python main.py "show me the contents of main.py"
 
-# Run Python scripts
+# Run Python scripts (in calculator directory)
 python main.py "execute the calculator tests"
 
-# Create new files
+# Create new files (in calculator directory)
 python main.py "create a hello world script"
 ```
 
@@ -75,7 +79,41 @@ Available functions:
 - **run_python_file**: Execute Python scripts
 - **write_file**: Create or modify files
 
-All operations are sandboxed to the `./calculator` directory for safety.
+**All operations are strictly sandboxed to the `./calculator` directory for safety. The agent cannot:**
+- Access files outside the calculator directory
+- Modify system files or configurations  
+- Install packages or run system commands
+- Access the internet or external services
+
+This is designed as a learning/demo environment for the calculator project only.
+
+## What Can The Agent Actually Do?
+
+The agent works exclusively with a simple calculator application in the `./calculator` directory. It can:
+
+### ✅ **Working With The Calculator Project**
+- **Analyze** the calculator's Python code (main.py, tests.py, etc.)
+- **Fix bugs** in the calculator logic or implementation
+- **Add features** like new mathematical operations or input validation
+- **Refactor code** to use better design patterns
+- **Run tests** and interpret results
+- **Create documentation** or additional Python files
+- **Improve error handling** and user experience
+
+### ❌ **What It Cannot Do**
+- Work on real-world projects outside the calculator directory
+- Install Python packages or dependencies
+- Access databases, APIs, or network resources  
+- Modify system configurations or environment settings
+- Work with version control (git) or deployment tools
+- Access your actual development projects
+
+### 🎯 **Best Use Cases**
+- **Learning AI agent architecture** and function calling patterns
+- **Experimenting with autonomous debugging** on a simple codebase
+- **Understanding LLM-based code analysis** and generation
+- **Testing AI agent capabilities** in a safe, controlled environment
+- **Educational purposes** for studying AI-assisted development
 
 ---
 
