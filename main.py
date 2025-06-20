@@ -51,11 +51,6 @@ def generate_content(client, messages, verbose):
             print("Prompt tokens:", response.usage_metadata.prompt_token_count)
             print("Response tokens:", response.usage_metadata.candidates_token_count)
         
-        # Add the response candidates to messages
-        if response.candidates:
-            for candidate in response.candidates:
-                messages.append(candidate.content)
-        
         # Check if there are function calls to make
         if not response.function_calls:
             # No function calls, agent is done
@@ -63,8 +58,12 @@ def generate_content(client, messages, verbose):
             print(response.text)
             return response.text
         
-        # Process function calls
-        function_called = False
+        # Add the assistant's response with function calls to messages
+        if response.candidates:
+            messages.append(response.candidates[0].content)
+        
+        # Process function calls and collect all results
+        function_response_parts = []
         for function_call_part in response.function_calls:
             function_call_result = call_function(function_call_part, verbose)
             
@@ -77,18 +76,18 @@ def generate_content(client, messages, verbose):
             if verbose:
                 print(f"-> {function_call_result.parts[0].function_response.response}")
             
-            # Add the function result to messages
-            messages.append(function_call_result)
-            function_called = True
+            # Collect the function response part
+            function_response_parts.append(function_call_result.parts[0])
         
-        # If we made function calls, continue the loop
-        if function_called:
-            continue
-        else:
-            # No function calls were made, break out
-            print("Final response:")
-            print(response.text)
-            return response.text
+        # Add all function responses as a single tool message
+        if function_response_parts:
+            tool_response = types.Content(
+                role="tool",
+                parts=function_response_parts
+            )
+            messages.append(tool_response)
+        
+        # Continue the loop since we made function calls
     
     # If we've reached max iterations
     print("Max iterations reached. Final response:")
