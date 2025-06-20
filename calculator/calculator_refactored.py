@@ -1,4 +1,3 @@
-
 class OperationStrategy:
     def execute(self, x, y):
         raise NotImplementedError
@@ -22,7 +21,7 @@ class Multiply(OperationStrategy):
 class Divide(OperationStrategy):
     def execute(self, x, y):
         if y == 0:
-            raise ValueError("Cannot divide by zero")
+            raise ValueError("Division by zero is not allowed.")
         return x / y
 
 
@@ -40,15 +39,15 @@ class Calculator:
             x = float(x)
             y = float(y)
         except ValueError:
-            raise ValueError("Invalid input: x and y must be numeric")
+            raise ValueError("Invalid input: Both x and y must be numeric values.")
 
         if operation not in self.operations:
-            raise ValueError("Invalid operation")
+            raise ValueError(f"Invalid operation: '{operation}' is not a supported operation. Supported operations are: {', '.join(self.operations.keys())}")
 
         try:
             return self.operations[operation].execute(x, y)
         except Exception as e:
-            raise e
+            raise Exception(f"An error occurred during the {operation} operation: {e}")
 
 
 if __name__ == '__main__':

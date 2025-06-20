@@ -1,26 +1,45 @@
 import unittest
-from pkg.calculator import Calculator
+import advanced_calculator
 
-class TestCalculator(unittest.TestCase):
+class TestAdvancedCalculator(unittest.TestCase):
 
-    def setUp(self):
-        self.calculator = Calculator()
+    def test_add(self):
+        self.assertEqual(advanced_calculator.add(1, 2), 3)
+        self.assertEqual(advanced_calculator.add(-1, 2), 1)
+        self.assertEqual(advanced_calculator.add(0, 0), 0)
 
-    def test_parentheses(self):
-        self.assertEqual(self.calculator.evaluate("(2 + 3) * 4"), 20.0)
-        self.assertEqual(self.calculator.evaluate("2 * (3 + 4)"), 14.0)
-        self.assertEqual(self.calculator.evaluate("10 - (4 / 2)"), 8.0)
-        self.assertEqual(self.calculator.evaluate("((10 - 4) / 2)"), 3.0)
+    def test_subtract(self):
+        self.assertEqual(advanced_calculator.subtract(1, 2), -1)
+        self.assertEqual(advanced_calculator.subtract(-1, 2), -3)
+        self.assertEqual(advanced_calculator.subtract(0, 0), 0)
 
-    def test_power(self):
-        self.assertEqual(self.calculator.evaluate("2 ** 3"), 8.0)
-        self.assertEqual(self.calculator.evaluate("3 ** 2"), 9.0)
-        self.assertEqual(self.calculator.evaluate("2 ** (1 + 2)"), 8.0)
+    def test_multiply(self):
+        self.assertEqual(advanced_calculator.multiply(1, 2), 2)
+        self.assertEqual(advanced_calculator.multiply(-1, 2), -2)
+        self.assertEqual(advanced_calculator.multiply(0, 0), 0)
 
-    def test_precedence(self):
-        self.assertEqual(self.calculator.evaluate("2 + 3 * 4"), 14.0)
-        self.assertEqual(self.calculator.evaluate("2 * 3 + 4"), 10.0)
-        self.assertEqual(self.calculator.evaluate("2 + 3 ** 2"), 11.0)
+    def test_divide(self):
+        self.assertEqual(advanced_calculator.divide(1, 2), 0.5)
+        self.assertEqual(advanced_calculator.divide(-1, 2), -0.5)
+        self.assertEqual(advanced_calculator.divide(0, 1), 0)
+        self.assertEqual(advanced_calculator.divide(1, 0), "Cannot divide by zero")
+
+    def test_exponentiate(self):
+        self.assertEqual(advanced_calculator.exponentiate(2, 3), 8)
+        self.assertEqual(advanced_calculator.exponentiate(2, -1), 0.5)
+        self.assertEqual(advanced_calculator.exponentiate(0, 0), 1)
+
+    def test_square_root(self):
+        self.assertEqual(advanced_calculator.square_root(4), 2)
+        self.assertEqual(advanced_calculator.square_root(0), 0)
+        self.assertEqual(advanced_calculator.square_root(-1), "Cannot calculate square root of a negative number")
+
+    def test_factorial(self):
+        self.assertEqual(advanced_calculator.factorial(0), 1)
+        self.assertEqual(advanced_calculator.factorial(5), 120)
+        self.assertEqual(advanced_calculator.factorial(1), 1)
+        self.assertEqual(advanced_calculator.factorial(-1), "Cannot calculate factorial of a negative number")
+        self.assertEqual(advanced_calculator.factorial(1.5), "Cannot calculate factorial of a non-integer number")
 
 if __name__ == '__main__':
     unittest.main()

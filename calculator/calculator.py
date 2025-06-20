@@ -1,54 +1,33 @@
-
-from abc import ABC, abstractmethod
-
-class Operation(ABC):
-    @abstractmethod
-    def execute(self, x, y):
-        pass
-
-class Addition(Operation):
-    def execute(self, x, y):
-        return x + y
-
-class Subtraction(Operation):
-    def execute(self, x, y):
-        return x - y
-
-class Multiplication(Operation):
-    def execute(self, x, y):
-        return x * y
-
-class Division(Operation):
-    def execute(self, x, y):
-        if y == 0:
-            raise ValueError("Cannot divide by zero")
-        return x / y
+import ast
+import operator as op
 
 class Calculator:
     def __init__(self):
-        self.operations = {
-            '+': Addition(),
-            '-': Subtraction(),
-            '*': Multiplication(),
-            '/': Division()
+        pass
+
+    def calculate(self, expression):
+        """Evaluates a mathematical expression string."""
+        # Supported operators
+        operators = {
+            ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
+            ast.Div: op.truediv, ast.Pow: op.pow, ast.USub: op.neg
         }
 
-    def calculate(self, x, y, operator):
-        operation = self.operations.get(operator)
-        if not operation:
-            raise ValueError("Invalid operator")
-        return operation.execute(x, y)
+        def eval_expr(node):
+            if isinstance(node, ast.Constant):
+                return node.value
+            elif isinstance(node, ast.BinOp):
+                return operators[type(node.op)](eval_expr(node.left), eval_expr(node.right))
+            elif isinstance(node, ast.UnaryOp):
+                return operators[type(node.op)](eval_expr(node.operand))
+            else:
+                raise TypeError(node)
+
+        node_tree = ast.parse(expression, mode='eval').body
+        return eval_expr(node_tree)
 
 if __name__ == '__main__':
     calculator = Calculator()
-    x = 10
-    y = 5
-    operator = '+'
-    result = calculator.calculate(x, y, operator)
-    print(f"{x} {operator} {y} = {result}")
-
-    x = 10
-    y = 5
-    operator = '/'
-    result = calculator.calculate(x, y, operator)
-    print(f"{x} {operator} {y} = {result}")
+    expression = "(2 + 3) * 4"
+    result = calculator.calculate(expression)
+    print(f"{expression} = {result}")
